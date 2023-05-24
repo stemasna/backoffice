@@ -1,8 +1,10 @@
 <template>
   <q-drawer
-    v-model="leftDrawerOpen"
+    v-model="open"
     show-if-above
     bordered
+    :breakpoint="600"
+    :width="280"
     style="background-color: #fff"
   >
     <!-- inizio  -->
@@ -22,7 +24,7 @@
         </div>
       </div>
     </q-img>
-    <q-separator background-color="orange" inset></q-separator>
+
     <!-- fine
     <q-item-section>
       <q-img src="../../assets/title.png" />
@@ -81,7 +83,7 @@
 </template>
 
 <script>
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 
@@ -91,12 +93,32 @@ export default defineComponent({
     const store = useStore();
     const router = useRouter();
     const route = useRouter();
+    const toggleLeftDrawer = (v) => store.commit("setLeftDrawer", v);
+
+    const open = ref();
 
     return {
       router,
       route,
+      toggleLeftDrawer,
+      open,
       leftDrawerOpen: computed(() => store.getters.leftDrawerOpen),
     };
+  },
+  watch: {
+    leftDrawerOpen: {
+      deep: true,
+      handler(newValue) {
+        this.open = newValue;
+        console.log(newValue, this.open);
+      },
+    },
+    open: {
+      deep: true,
+      handler(newValue) {
+        this.toggleLeftDrawer(newValue);
+      },
+    },
   },
 });
 </script>

@@ -21,6 +21,15 @@
           </template>
         </q-input>
       </div>
+      <div>
+        <q-btn
+          icon="filter_list"
+          @click="ListfilterTable"
+          round
+          color="primary"
+        ></q-btn>
+        {{ $t("common.filter") }}
+      </div>
     </div>
 
     <q-table
@@ -149,10 +158,13 @@ export default defineComponent({
         },
       });
     },
+    ListfilterTable() {
+      this.$q.notify("Filter list");
+    },
 
     async getUserPlatform() {
       try {
-        const { data } = await api.get("Platform", {
+        const { data } = await api.get("user/officelist", {
           params: {
             limit: 20,
           },

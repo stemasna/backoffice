@@ -23,6 +23,15 @@
           </template>
         </q-input>
       </div>
+      <div>
+        <q-btn
+          icon="filter_list"
+          @click="ListfilterTable"
+          round
+          color="primary"
+        ></q-btn>
+        {{ $t("common.filter") }}
+      </div>
     </div>
 
     <q-table

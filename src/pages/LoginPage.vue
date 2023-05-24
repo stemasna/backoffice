@@ -82,7 +82,7 @@ export default defineComponent({
       try {
         loading.value = true;
         await store.dispatch("login", user.value);
-        await router.push({ name: "users" });
+        await router.push({ name: "UserPlatformPage" });
         loading.value = false;
       } catch (e) {
         console.error({ e });

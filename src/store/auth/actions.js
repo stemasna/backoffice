@@ -2,7 +2,7 @@ import { api } from "boot/axios";
 
 export async function login({ commit }, payload) {
   const { email, password } = payload;
-  const { data } = await api.post("user", undefined, {
+  const { data } = await api.post("login", undefined, {
     headers: {
       Authorization: "Basic " + btoa(email + ":" + password),
     },

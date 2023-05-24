@@ -84,25 +84,26 @@
             dense
           />
 
-          <q-input
-            class="col-12 col-md-4"
-            ref="date_creationRef"
-            :rules="[notEmpty]"
-            v-model="ArtWorkRegistered.date_creation"
-            :label="$t('common.date_creation')"
-            outlined
-            dense
-          >
-            <!-- inizio nuova data -->
+          <q-input v-model="date" filled type="date" />
+          <!-- inizio nuova data -->
 
-            <!-- fine nuova data -->
-          </q-input>
+          <!-- fine nuova data -->
+
           <q-input
             class="col-12 col-md-4"
             ref="date"
             :rules="[notEmpty]"
             v-model="ArtWorkRegistered.date"
             :label="$t('common.date')"
+            outlined
+            dense
+          />
+          <q-input
+            class="col-12 col-md-4"
+            ref="series"
+            :rules="[notEmpty]"
+            v-model="ArtWorkRegistered.series"
+            :label="$t('common.series')"
             outlined
             dense
           />

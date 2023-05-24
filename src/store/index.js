@@ -2,7 +2,8 @@ import { createStore, createLogger } from "vuex";
 import createPersistedState from "vuex-persistedstate";
 import user from "./user";
 import app from "./app";
-import dishes from "./dishes";
+import auth from "./auth";
+
 // import example from './module-example'
 
 /*
@@ -18,12 +19,12 @@ const store = createStore({
   modules: {
     user,
     app,
-    dishes,
+    auth,
   },
   plugins: [
     createLogger(),
     createPersistedState({
-      key: "quasar-project-jac",
+      key: "backoffice",
       paths: ["user"],
     }),
   ],

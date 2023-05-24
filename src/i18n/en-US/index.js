@@ -45,5 +45,7 @@ export default {
     delete_account: "Elimina Account",
     reset_password: "Resetta Password",
     date_creation: "Anno Creazione",
+    series: "Numero Di Serie",
+    filter: "Filtri",
   },
 };

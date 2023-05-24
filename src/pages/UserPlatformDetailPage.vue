@@ -44,7 +44,7 @@
                 :label="$t('common.admin')"
               />
               <q-radio
-                v-model="register"
+                v-model="admin"
                 val="register"
                 :label="$t('common.recorder')"
               />
@@ -53,7 +53,7 @@
 
           <!-- parte di admin o registratore -->
           <!-- da far vedere -->
-          <div v-if="admin">
+          <div v-if="admin === 'admin'">
             <!-- admin -->
             <div class="row q-col-gutter-md q-mt-md text-h6">
               <q-input
@@ -85,7 +85,7 @@
               />
             </div>
           </div>
-          <div v-if="register">
+          <div v-if="admin === 'register'">
             <div class="text-h6">
               <!-- registratore -->
               <div class="row q-col-gutter-md q-mt-md">

@@ -20,6 +20,15 @@
           </template>
         </q-input>
       </div>
+      <div>
+        <q-btn
+          icon="filter_list"
+          @click="ListfilterTable"
+          round
+          color="primary"
+        ></q-btn>
+        {{ $t("common.filter") }}
+      </div>
     </div>
 
     <q-table
@@ -144,7 +153,7 @@ export default defineComponent({
 
     async getUserManaged() {
       try {
-        const { data } = await api.get("Managed", {
+        const { data } = await api.get("user/userlist", {
           params: {
             limit: 20,
           },
