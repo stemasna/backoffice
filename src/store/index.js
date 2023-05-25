@@ -2,7 +2,7 @@ import { createStore, createLogger } from "vuex";
 import createPersistedState from "vuex-persistedstate";
 import user from "./user";
 import app from "./app";
-import auth from "./auth";
+// import auth from "./auth";
 
 // import example from './module-example'
 
@@ -19,7 +19,6 @@ const store = createStore({
   modules: {
     user,
     app,
-    auth,
   },
   plugins: [
     createLogger(),

@@ -2,7 +2,6 @@
   <q-page padding>
     <div class="row">
       <div class="text-weight-bold text-h4">
-        qui ci andra id e nome
         <q-toggle v-model="active">
           <div v-if="active">
             <div class="text-h6">{{ $t("common.active") }}</div>

@@ -43,17 +43,17 @@
           <q-btn
             icon="edit"
             @click="() => router.push(`Managed/${props.key}`)"
-            color="black"
+            color="primary"
             round
             flat
           />
-          <!-- <q-btn
-              icon="delete"
-              @click="() => deleteUserManaged(props.key)"
-              color="primary"
-              round
-              flat
-            /> -->
+          <q-btn
+            icon="delete"
+            @click="() => deleteUserManaged(props.key)"
+            color="red"
+            round
+            flat
+          />
         </q-td>
       </template>
     </q-table>
@@ -83,18 +83,13 @@ export default defineComponent({
   data() {
     return {
       rows: [],
-      filter: "",
+      filter: undefined,
       columns: [
         {
           name: "actions",
           align: "left",
         },
-        {
-          name: "id",
-          label: this.$t("common.id"),
-          align: "left",
-          field: (row) => row?.id || " - ",
-        },
+
         {
           name: "name",
           label: this.$t("common.name"),
@@ -136,11 +131,11 @@ export default defineComponent({
       );
     },
   },
-  watch: {
-    token(newValue) {
-      newValue && this.getUserManaged();
-    },
-  },
+  // watch: {
+  //   token(newValue) {
+  //     newValue && this.getUserManaged();
+  //   },
+  // },
   methods: {
     createUserManaged() {
       this.router.push({
@@ -150,6 +145,9 @@ export default defineComponent({
         },
       });
     },
+    ListfilterTable() {
+      this.$q.notify("Filter list");
+    },
 
     async getUserManaged() {
       try {
@@ -158,17 +156,17 @@ export default defineComponent({
             limit: 20,
           },
         });
+        console.log({ data });
         this.rows = data;
       } catch (e) {
         console.error({ e });
       }
     },
-    /*async deleteUserManaged(id) {
-      console.log(id);
+    async deleteUserManaged(id) {
       await this.$api
-        .delete("/Managed/" + id)
+        .delete("/user/remove/" + id)
         .then(() => _.remove(this.rows, (r) => r.id === id));
-    },*/
+    },
   },
   async created() {
     await this.getUserManaged();

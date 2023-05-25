@@ -44,17 +44,17 @@
           <q-btn
             icon="edit"
             @click="() => router.push(`Platform/${props.key}`)"
-            color="black"
+            color="primary"
             round
             flat
           />
-          <!-- <q-btn
-              icon="delete"
-              @click="() => deleteUserPlatform(props.key)"
-              color="primary"
-              round
-              flat
-            /> -->
+          <q-btn
+            icon="delete"
+            @click="() => deleteUserPlatform(props.key)"
+            color="red"
+            round
+            flat
+          />
         </q-td>
       </template>
     </q-table>
@@ -91,12 +91,6 @@ export default defineComponent({
           align: "left",
         },
         {
-          name: "id",
-          label: this.$t("common.id"),
-          align: "left",
-          field: (row) => row?.id || " - ",
-        },
-        {
           name: "name",
           label: this.$t("common.name"),
           align: "left",
@@ -115,13 +109,13 @@ export default defineComponent({
           field: (row) => row?.email || " - ",
         },
         {
-          name: "username",
-          label: this.$t("common.username"),
+          name: "password",
+          label: this.$t("common.password"),
           align: "left",
-          field: (row) => row?.username || " - ",
+          field: (row) => row?.password || " - ",
         },
         {
-          name: "level",
+          name: "role",
           label: this.$t("common.level"),
           align: "left",
           field: (row) => row?.level || " - ",
@@ -140,7 +134,7 @@ export default defineComponent({
           d.surname.includes(this.filter) ||
           d.email.includes(this.filter) ||
           d.username.includes(this.filter) ||
-          d.level.includes(this.filter)
+          d.role.includes(this.filter)
       );
     },
   },
@@ -164,22 +158,19 @@ export default defineComponent({
 
     async getUserPlatform() {
       try {
-        const { data } = await api.get("user/officelist", {
-          params: {
-            limit: 20,
-          },
-        });
+        const { data } = await api.get("user/officelist", {});
         this.rows = data;
+        console.log({ data });
       } catch (e) {
         console.error({ e });
       }
     },
-    /*async deleteUserPlatform(id) {
+    async deleteUserPlatform(id) {
       console.log(id);
       await this.$api
-        .delete("/Platform/" + id)
+        .delete("/user/remove" + id)
         .then(() => _.remove(this.rows, (r) => r.id === id));
-    },*/
+    },
   },
   async created() {
     await this.getUserPlatform();
