@@ -52,55 +52,55 @@ import { useStore } from "vuex";
 export default defineComponent({
   name: "LoginPage",
   setup() {
-    const emailRegex = /^\S+@\S+\.\S+$/;
-    const router = useRouter();
-    const store = useStore();
-    const route = useRoute();
-    const loading = ref(false);
-    const emailRef = ref(null);
-    const passwordRef = ref(null);
-
-    const user = ref({
-      email: undefined,
-      password: undefined,
-    });
-
-    const notEmpty = (val) => !!val || t("common.requiredField");
-    const validEmail = (val) =>
-      emailRegex.test(val) || t("common.invalidEmail");
-
-    const isValid = () => {
+    return {
+      emailRegex: /^\S+@\S+\.\S+$/,
+      router: useRouter(),
+      store: useStore(),
+      route: useRoute(),
+    };
+  },
+  data() {
+    return {
+      loading: false,
+      user: {
+        email: undefined,
+        password: undefined,
+      },
+      emailRef: undefined,
+      passwordRef: undefined,
+    };
+  },
+  methods: {
+    async notEmpty(val) {
+      return !!val || (await t("common.requiredField"));
+    },
+    async validEmail(val) {
+      return emailRegex.test(val) || (await t("common.invalidEmail"));
+    },
+    isValid() {
       const fieldsIsValid = [];
-      fieldsIsValid.push(emailRef.value.validate());
-      fieldsIsValid.push(passwordRef.value.validate());
+
+      fieldsIsValid.push(this.emailRef.value.validate());
+      fieldsIsValid.push(this.passwordRef.value.validate());
 
       return fieldsIsValid.every((f) => f === true);
-    };
-
-    const onClickSave = async () => {
-      if (!isValid()) return;
+    },
+    async createLogin() {
+      const { data } = await api.post("login", this.user);
+      return data;
+    },
+    async onClickSave() {
       try {
-        loading.value = true;
-        await store.dispatch("login", user.value);
-        await router.push({ name: "UserPlatformPage" });
-        loading.value = false;
+        this.loading = true;
+        await this.createLogin().then((elem) => {
+          router.push({ name: "UserPlatformPage" });
+        });
+        this.loading = false;
       } catch (e) {
         console.error({ e });
-        loading.value = false;
+        this.loading = false;
       }
-    };
-
-    return {
-      router,
-      route,
-      user,
-      loading,
-      notEmpty,
-      validEmail,
-      onClickSave,
-      emailRef,
-      passwordRef,
-    };
+    },
   },
 });
 </script>

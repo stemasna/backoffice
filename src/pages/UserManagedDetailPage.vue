@@ -40,15 +40,6 @@
           <div class="row q-col-gutter-md q-mt-md text-h6">
             <q-input
               class="col-12 col-md-4"
-              ref="idRef"
-              :rules="[notEmpty]"
-              v-model="UserManaged.id"
-              :label="$t('common.id')"
-              outlined
-              dense
-            />
-            <q-input
-              class="col-12 col-md-4"
               ref="nameRef"
               :rules="[notEmpty]"
               v-model="UserManaged.name"
@@ -68,9 +59,18 @@
             <q-input
               class="col-12 col-md-4"
               ref="emailRef"
-              :rules="[notEmpty]"
+              :rules="[notEmpty, validEmail]"
               v-model="UserManaged.email"
               :label="$t('common.email')"
+              outlined
+              dense
+            />
+            <q-input
+              class="col-12 col-md-4"
+              ref="passwordRef"
+              :rules="[notEmpty]"
+              v-model="UserManaged.password"
+              :label="$t('common.password')"
               outlined
               dense
             />
@@ -83,8 +83,19 @@
               outlined
               dense
             />
+            <q-select
+              class="col-12 col-md-4"
+              v-model="UserManaged.role"
+              ref="roleRef"
+              :options="options"
+              :label="$t('common.choose_role')"
+              outlined
+              disable
+              readonly
+              dense
+            />
           </div>
-          <q-btn
+          <!-- <q-btn
             outline
             style="color: blue"
             :label="$t('common.reset_password')"
@@ -93,102 +104,122 @@
             outline
             style="color: blue"
             :label="$t('common.delete_account')"
-          />
+          /> -->
         </div>
       </div>
     </div>
   </q-page>
 </template>
-
 <script>
-import { computed, defineComponent, ref } from "vue";
+import { defineComponent } from "vue";
 import { api } from "boot/axios";
 import { useRouter, useRoute } from "vue-router";
-import { t } from "boot/i18n";
-import { mapGetters } from "vuex";
 
 export default defineComponent({
-  name: "UserManagedDetailPage",
+  name: "UsersDetailPage",
   setup() {
-    const router = useRouter();
-    const route = useRoute();
-    const loading = ref(false);
-    const idRef = ref(null);
-    const nameRef = ref(null);
-    const priceRef = ref(null);
+    return {
+      router: useRouter(),
+      route: useRoute(),
+    };
+  },
+  data() {
+    return {
+      emailRegex: /^\S+@\S+\.\S+$/,
+      active: false,
+      admin: false,
+      register: false,
+      loading: false,
+      UserManaged: {
+        name: undefined,
+        surname: undefined,
+        email: undefined,
+        phone: undefined,
+        password: undefined,
+        role: "user",
+      },
 
-    const isAdd = computed(() => route.params.id === "new");
+      nameRef: undefined,
+      surnameRef: undefined,
+      emailRef: undefined,
+      passwordRef: undefined,
+      phoneRef: undefined,
+      roleRef: undefined,
+    };
+  },
+  methods: {
+    async notEmpty(val) {
+      return !!val || (await t("common.requiredField"));
+    },
+    async validEmail(val) {
+      return emailRegex.test(val) || (await t("common.invalidEmail"));
+    },
 
-    const UserManaged = ref({
-      id: undefined,
-      name: undefined,
-      price: undefined,
-    });
-
-    const notEmpty = (val) => !!val || t("common.requiredField");
-
-    const isValid = () => {
+    isValid() {
       const fieldsIsValid = [];
-      fieldsIsValid.push(idRef.value.validate());
-      fieldsIsValid.push(nameRef.value.validate());
-      fieldsIsValid.push(priceRef.value.validate());
-      isAdd.value;
+      fieldsIsValid.push(this.nameRef.value.validate());
+      fieldsIsValid.push(this.surnameRef.value.validate());
+      fieldsIsValid.push(this.emailRef.value.validate());
+      fieldsIsValid.push(this.passwordRef.value.validate());
+      fieldsIsValid.push(this.phoneRef.value.validate());
+      this.isAdd.value;
 
       return fieldsIsValid.every((f) => f === true);
-    };
+    },
 
-    const createUserManaged = async () => {
-      const { data } = await api.post("Managed", UserManaged.value);
+    async createUserManaged() {
+      const { data } = await api.post("user/create", this.UserManaged);
       return data;
-    };
+    },
 
-    const updateUserManaged = async () => {
-      const { id } = route.params;
-      const { data } = await api.put(`Managed/${id}`, UserManaged.value);
-      return data;
-    };
-
-    const onClickSave = async () => {
-      if (!isValid()) return;
-      try {
-        loading.value = true;
-        isAdd.value ? await createUserManaged() : await updateUserManaged();
-        loading.value = false;
-        router.back();
-      } catch (e) {
-        console.error({ e });
-        loading.value = false;
-      }
-    };
-
-    const getUserManaged = async () => {
-      try {
-        if (isAdd.value) {
-          return;
+    async onClickSave() {
+      if (this.$route.params.id === "new") {
+        try {
+          this.loading = true;
+          await this.createUserManaged().then((elem) => {
+            this.isAdd = elem;
+            console.log({ elem });
+            this.router.back();
+          });
+          this.loading = false;
+        } catch (e) {
+          console.error({ e });
+          this.loading = false;
         }
-        const { data } = await api.get(`Managed/${route.params.id}`);
-        UserManaged.value = { ...data };
+      } else {
+        const userId = this.$route.params.id;
+
+        const { data } = await api.put(`user/${userId}`, this.UserManaged);
+        console.log({ data });
+      }
+    },
+    async getUserManaged() {
+      try {
+        const { data } = await api.get(`user/${route.params.id}`);
+        return data;
       } catch (e) {
         console.error({ e });
       }
-    };
+    },
+  },
+  computed: {
+    isAdd() {
+      return this.$route.params.id === "new";
+    },
+  },
 
-    getUserManaged();
-
-    return {
-      router,
-      route,
-      UserManaged,
-      loading,
-      notEmpty,
-      onClickSave,
-      nameRef,
-      priceRef,
-      isAdd,
-      admin: ref(false),
-      register: ref(false),
-      active: ref(false),
-    };
+  async mounted() {
+    //console.log(this.$route.params.id);
+    if (this.$route.params.id === "new") {
+    } else {
+      const userId = this.$route.params.id;
+      this.active = true;
+      const { data: user } = await api.get(`user/${userId}`);
+      //const user = await api.get(`user/read`, userId);
+      //console.log({ user });
+      this.UserManaged = user;
+      //console.log(this.UserManaged);
+    }
   },
 });
 </script>

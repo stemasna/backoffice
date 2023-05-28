@@ -45,7 +45,7 @@
               />
               <q-radio
                 v-model="admin"
-                val="register"
+                val="registratore"
                 :label="$t('common.recorder')"
               />
             </div>
@@ -77,15 +77,24 @@
               <q-input
                 class="col-12 col-md-4"
                 ref="emailRef"
-                :rules="[notEmpty]"
+                :rules="[notEmpty, validEmail]"
                 v-model="UserPlatform.email"
                 :label="$t('common.email')"
                 outlined
                 dense
               />
+              <q-input
+                class="col-12 col-md-12"
+                ref="passwordRef"
+                :rules="[notEmpty]"
+                v-model="UserPlatform.password"
+                :label="$t('common.password')"
+                outlined
+                dense
+              />
             </div>
           </div>
-          <div v-if="admin === 'register'">
+          <div v-if="admin === 'registratore'">
             <div class="text-h6">
               <!-- registratore -->
               <div class="row q-col-gutter-md q-mt-md">
@@ -117,6 +126,15 @@
                   dense
                 />
                 <q-input
+                  class="col-12 col-md-12"
+                  ref="passwordRef"
+                  :rules="[notEmpty]"
+                  v-model="UserPlatform.password"
+                  :label="$t('common.password')"
+                  outlined
+                  dense
+                />
+                <q-input
                   class="col-12 col-md-4"
                   ref="phoneRef"
                   :rules="[notEmpty]"
@@ -132,7 +150,7 @@
         <div v-else>
           <div class="text-h6">
             <!-- se non è attivo  -->
-            Attivare account
+            {{ $t("common.active_account") }}
           </div>
         </div>
       </div>
@@ -141,94 +159,128 @@
 </template>
 
 <script>
-import { computed, defineComponent, ref } from "vue";
+import { defineComponent } from "vue";
 import { api } from "boot/axios";
 import { useRouter, useRoute } from "vue-router";
-import { t } from "boot/i18n";
-import { mapGetters } from "vuex";
 
 export default defineComponent({
-  name: "UserPlatformDetailPage",
+  name: "UsersDetailPage",
   setup() {
-    const router = useRouter();
-    const route = useRoute();
-    const loading = ref(false);
-    const idRef = ref(null);
-    const nameRef = ref(null);
-    const priceRef = ref(null);
+    return {
+      router: useRouter(),
+      route: useRoute(),
+    };
+  },
+  data() {
+    return {
+      emailRegex: /^\S+@\S+\.\S+$/,
+      active: false,
+      admin: false,
+      register: false,
+      loading: false,
+      UserPlatform: {
+        name: undefined,
+        surname: undefined,
+        email: undefined,
+        phone: undefined,
+        password: undefined,
+        role: undefined,
+      },
+      nameRef: undefined,
+      surnameRef: undefined,
+      emailRef: undefined,
+      passwordRef: undefined,
+      phoneRef: undefined,
+      rolRef: undefined,
+    };
+  },
+  methods: {
+    async notEmpty(val) {
+      return !!val || (await t("common.requiredField"));
+    },
+    async validEmail(val) {
+      return emailRegex.test(val) || (await t("common.invalidEmail"));
+    },
 
-    const isAdd = computed(() => route.params.id === "new");
-
-    const UserPlatform = ref({
-      id: undefined,
-      name: undefined,
-      price: undefined,
-    });
-
-    const notEmpty = (val) => !!val || t("common.requiredField");
-
-    const isValid = () => {
+    isValid() {
       const fieldsIsValid = [];
-      fieldsIsValid.push(idRef.value.validate());
-      fieldsIsValid.push(nameRef.value.validate());
-      fieldsIsValid.push(priceRef.value.validate());
-      isAdd.value;
+      fieldsIsValid.push(this.nameRef.value.validate());
+      fieldsIsValid.push(this.surnameRef.value.validate());
+      fieldsIsValid.push(this.emailRef.value.validate());
+      fieldsIsValid.push(this.passwordRef.value.validate());
+      fieldsIsValid.push(this.phoneRef.value.validate());
+      this.isAdd.value;
 
       return fieldsIsValid.every((f) => f === true);
-    };
+    },
 
-    const createUserPlatform = async () => {
-      const { data } = await api.post("Platform", UserPlatform.value);
-      return data;
-    };
-
-    const updateUserPlatform = async () => {
-      const { id } = route.params;
-      const { data } = await api.put(`Platform/${id}`, UserPlatform.value);
-      return data;
-    };
-
-    const onClickSave = async () => {
-      if (!isValid()) return;
-      try {
-        loading.value = true;
-        isAdd.value ? await createUserPlatform() : await updateUserPlatform();
-        loading.value = false;
-        router.back();
-      } catch (e) {
-        console.error({ e });
-        loading.value = false;
+    async createUserPlatform() {
+      if (this.admin === "admin") {
+        this.UserPlatform.role = "admin";
+      } else {
+        this.UserPlatform.role = "registratore";
       }
-    };
 
-    const getUserPlatform = async () => {
-      try {
-        if (isAdd.value) {
-          return;
+      const { data } = await api.post("user/create", this.UserPlatform);
+      return data;
+    },
+
+    async onClickSave() {
+      if (this.$route.params.id === "new") {
+        try {
+          this.loading = true;
+          await this.createUserPlatform().then((elem) => {
+            this.isAdd = elem;
+            console.log({ elem });
+            this.router.back();
+          });
+          this.loading = false;
+        } catch (e) {
+          console.error({ e });
+          this.loading = false;
         }
-        const { data } = await api.get(`Platform/${route.params.id}`);
-        UserPlatform.value = { ...data };
+      } else {
+        const userId = this.$route.params.id;
+
+        const { data } = await api.put(
+          //cambio questa in base a cosa mi manda
+          `user/update/${userId}`,
+          this.UserPlatform
+        );
+        console.log({ data });
+      }
+    },
+    async getUserPlatform() {
+      try {
+        const { data } = await api.get(`user/${route.params.id}`);
+        return data;
       } catch (e) {
         console.error({ e });
       }
-    };
+    },
+  },
+  computed: {
+    isAdd() {
+      return this.$route.params.id === "new";
+    },
+  },
 
-    getUserPlatform();
-
-    return {
-      router,
-      route,
-      UserPlatform,
-      loading,
-      notEmpty,
-      onClickSave,
-      nameRef,
-      priceRef,
-      isAdd,
-      admin: ref(false),
-      register: ref(false),
-      active: ref(false),
-    };
+  async mounted() {
+    console.log(this.$route.params.id);
+    if (this.$route.params.id === "new") {
+    } else {
+      const userId = this.$route.params.id;
+      this.active = true;
+      const { data: user } = await api.get(`user/${userId}`);
+      //const user = await api.post(`user`, userId);
+      console.log({ user });
+      this.UserPlatform = user;
+      if (this.UserPlatform.role === "admin") {
+        this.admin = "admin";
+      } else {
+        this.admin = "register";
+      }
+    }
   },
 });
 </script>

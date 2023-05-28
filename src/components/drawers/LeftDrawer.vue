@@ -18,8 +18,8 @@
             <img src="../../assets/account.png" />
           </q-avatar>
           <div class="column" style="align-self: start">
-            <div>username</div>
-            <div>ruolo</div>
+            {{ details.name }} {{ details.surname }}
+            <div>{{ details.role }}</div>
           </div>
         </div>
       </div>
@@ -85,25 +85,26 @@
 <script>
 import { computed, defineComponent, ref } from "vue";
 import { useStore } from "vuex";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
+import { mapGetters } from "vuex";
 
 export default defineComponent({
   name: "LeftDrawer",
   setup() {
     const store = useStore();
-    const router = useRouter();
-    const route = useRouter();
     const toggleLeftDrawer = (v) => store.commit("setLeftDrawer", v);
-
     const open = ref();
-
     return {
-      router,
-      route,
-      toggleLeftDrawer,
-      open,
+      router: useRouter(),
+      route: useRoute(),
       leftDrawerOpen: computed(() => store.getters.leftDrawerOpen),
+      open,
+      toggleLeftDrawer,
     };
+  },
+
+  computed: {
+    ...mapGetters(["details"]),
   },
   watch: {
     leftDrawerOpen: {
