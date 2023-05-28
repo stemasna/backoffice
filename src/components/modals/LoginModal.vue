@@ -66,37 +66,46 @@ export default defineComponent({
   name: "LoginModal",
   emits: [...useDialogPluginComponent.emits],
   setup() {
-    const { dialogRef, onDialogHide, onDialogOK, onDialogCancel } =
-      useDialogPluginComponent();
-    const $q = useQuasar();
-    const emailRegex = /^\S+@\S+\.\S+$/;
-    const router = useRouter();
-    const store = useStore();
-    const route = useRoute();
-    const loading = ref(false);
-    const emailRef = ref(null);
-    const isPwd = ref(true);
-    const passwordRef = ref(null);
-
-    const user = ref({
-      email: undefined,
-      password: undefined,
-    });
-
-    const notEmpty = (val) => !!val || t("common.requiredField");
-    const validEmail = (val) =>
-      emailRegex.test(val) || t("common.invalidEmail");
-
-    const isValid = () => {
+    return {
+      dialogRef: useDialogPluginComponent(),
+      onDialogHide: useDialogPluginComponent(),
+      onDialogOK: useDialogPluginComponent(),
+      onDialogCancel: useDialogPluginComponent(),
+      $q: useQuasar(),
+      router: useRouter(),
+      store: useStore(),
+      route: useRoute(),
+    };
+  },
+  data() {
+    return {
+      loading: false,
+      emailRegex: /^\S+@\S+\.\S+$/,
+      user: {
+        email: undefined,
+        password: undefined,
+      },
+      emailRef: undefined,
+      passwordRef: undefined,
+      isPwd: true,
+    };
+  },
+  methods: {
+    async notEmpty(val) {
+      return !!val || (await t("common.requiredField"));
+    },
+    async validEmail(val) {
+      return this.emailRegex.test(val) || (await t("common.invalidEmail"));
+    },
+    isValid() {
       const fieldsIsValid = [];
-      fieldsIsValid.push(emailRef.value.validate());
-      fieldsIsValid.push(passwordRef.value.validate());
+
+      fieldsIsValid.push(this.emailRef.value.validate());
+      fieldsIsValid.push(this.passwordRef.value.validate());
 
       return fieldsIsValid.every((f) => f === true);
-    };
-
-    const onClickSave = async () => {
-      if (!isValid()) return;
+    },
+    async onClickSave() {
       try {
         loading.value = true;
         await store.dispatch("login", user.value);
@@ -109,23 +118,7 @@ export default defineComponent({
         console.error({ e });
         loading.value = false;
       }
-    };
-
-    return {
-      dialogRef,
-      onDialogHide,
-      onCancelClick: onDialogCancel,
-      router,
-      route,
-      user,
-      loading,
-      notEmpty,
-      validEmail,
-      onClickSave,
-      emailRef,
-      passwordRef,
-      isPwd,
-    };
+    },
   },
 });
 </script>

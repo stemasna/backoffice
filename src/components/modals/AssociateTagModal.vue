@@ -49,7 +49,7 @@ import { useStore } from "vuex";
 import { api } from "boot/axios";
 
 export default defineComponent({
-  name: "LoginModal",
+  name: "AssociatetagModal",
   props: ["id"],
   emits: [...useDialogPluginComponent.emits],
   setup() {
