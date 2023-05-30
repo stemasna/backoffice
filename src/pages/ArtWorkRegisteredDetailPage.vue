@@ -234,7 +234,7 @@ export default defineComponent({
     async onClickAssociatedTag() {
       return this.$q.dialog({
         component: AssociateTagModal,
-        componentProps: { id: this.ArtWorkRegistered._id },
+        componentProps: { id: this.ArtWorkRegistered.id },
       });
     },
   },

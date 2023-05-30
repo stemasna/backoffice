@@ -4,16 +4,14 @@
       <q-card flat bordered style="border-radius: 0.5rem" class="q-pa-md">
         <div class="row justify-center">
           <div class="row text-weight-bold text-h6">
-            <div class="col">
-              <q-btn
-                unelevated
-                icon="chevron_left"
-                @click="() => router.back()"
-                :loading="loading"
-              />
-            </div>
+            <q-btn
+              unelevated
+              icon="chevron_left"
+              @click="() => router.back()"
+              :loading="loading"
+            />
 
-            {{ $t("common.assoicate_tag_opera") }}
+            <div class="row">{{ $t("common.assoicate_title") }}</div>
           </div>
         </div>
         <div class="row q-col-gutter-md q-mt-md">
@@ -21,8 +19,26 @@
             class="col-12 col-md-12"
             ref="nameRef"
             :rules="[notEmpty]"
-            v-model="code.name"
+            v-model="code.artQr"
             :label="$t('common.cod_id_tag')"
+            outlined
+            dense
+          />
+          <q-input
+            class="col-12 col-md-12"
+            ref="certRef"
+            :rules="[notEmpty]"
+            v-model="code.certQr"
+            :label="$t('common.cod_cert')"
+            outlined
+            dense
+          />
+          <q-input
+            class="col-12 col-md-12"
+            ref="serieRef"
+            :rules="[notEmpty]"
+            v-model="code.Serie"
+            :label="$t('common.number_serie')"
             outlined
             dense
           />
@@ -68,8 +84,13 @@ export default defineComponent({
     return {
       loading: false,
       code: {
-        name: undefined,
+        artQr: undefined,
+        certQr: undefined,
+        Serie: undefined,
       },
+      nameRef: undefined,
+      certRef: undefined,
+      seriesRef: undefined,
     };
   },
   methods: {
@@ -91,9 +112,7 @@ export default defineComponent({
     },
     async createCodTag() {
       const id = this.id;
-      const { data } = await api.post(`securekits/${id}`, {
-        cod: this.code,
-      });
+      const { data } = await api.post(`securekits/${id}`, this.code);
       return data;
     },
     async onClickSave() {

@@ -244,7 +244,7 @@ export default defineComponent({
 
         const { data } = await api.put(
           //cambio questa in base a cosa mi manda
-          `user/update/${userId}`,
+          `user/${userId}`,
           this.UserPlatform
         );
         console.log({ data });

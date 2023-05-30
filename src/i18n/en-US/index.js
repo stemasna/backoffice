@@ -49,9 +49,11 @@ export default {
     series: "Numero Di Serie",
     filter: "Filtri",
     ass_tag: "Associa Tag",
-    assoicate_tag_opera: "Associa Tag Opera",
+    assoicate_title: "Associa Tag Opera e Certificato Opera",
     save_prosegui: "Salva e Prosegui",
     cod_id_tag: "Codice Identificativo Tag",
     active_account: "Attivare L'Account",
+    number_serie: "Inserisci Numero Di Serie",
+    cod_cert: "Inserisci Numero Certificato",
   },
 };

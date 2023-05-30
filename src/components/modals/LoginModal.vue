@@ -1,5 +1,5 @@
 <template>
-  <q-dialog ref="dialogRef" @hide="onDialogHide">
+  <q-dialog ref="dialog" @hide="onDialogHide">
     <q-card class="q-dialog-plugin">
       <q-card flat bordered style="border-radius: 0.5rem" class="q-pa-md">
         <div class="row justify-center">
@@ -69,7 +69,7 @@ export default defineComponent({
     return {
       dialogRef: useDialogPluginComponent(),
       onDialogHide: useDialogPluginComponent(),
-      onDialogOK: useDialogPluginComponent(),
+      //onDialogOK: useDialogPluginComponent(),
       onDialogCancel: useDialogPluginComponent(),
       $q: useQuasar(),
       router: useRouter(),
@@ -91,6 +91,12 @@ export default defineComponent({
     };
   },
   methods: {
+    show() {
+      this.$refs.dialog.show();
+    },
+    hide() {
+      this.$refs.dialogRef.hide();
+    },
     async notEmpty(val) {
       return !!val || (await t("common.requiredField"));
     },
@@ -107,17 +113,23 @@ export default defineComponent({
     },
     async onClickSave() {
       try {
-        loading.value = true;
-        await store.dispatch("login", user.value);
-        $q.notify({
-          message: t("common.welcome"),
+        this.loading = true;
+        await this.store.dispatch("login", this.user);
+        this.$q.notify({
+          message: this.$t("common.welcome"),
         });
-        onDialogOK();
-        loading.value = false;
+        this.onDialogOK();
+        this.loading = false;
       } catch (e) {
         console.error({ e });
-        loading.value = false;
+        this.loading = false;
       }
+    },
+    onDialogOK() {
+      this.router.back();
+    },
+    async onCancelClick() {
+      this.router.back();
     },
   },
 });

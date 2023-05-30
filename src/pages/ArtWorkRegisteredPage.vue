@@ -123,32 +123,14 @@ export default defineComponent({
           name: "user_registrator",
           label: this.$t("common.user_registrator"),
           align: "left",
-          field: (row) => row?.user_registrator || " - ",
-        } /*
-        {
-          name: "tag",
-          label: this.$t("common.tag"),
-          align: "left",
-          field: (row) => row?.tag || " - ",
-        },*/,
+          field: (row) => row?.utente_registratore || " - ",
+        },
       ],
     };
   },
   computed: {
     ...mapGetters(["token"]),
-    /*
-    filteredData() {
-      if (!this.filter) return this.rows;
-      return this?.rows.filter(
-        (d) =>
-          d.Titolo.includes(this.filter) ||
-          d.NomeArtista.includes(this.filter) ||
-          d.NazionalitaArtista.includes(this.filter) ||
-          d.DataRegistrazione.includes(this.filter) ||
-          d.hours.includes(this.filter) ||
-          d.user_registrator.includes(this.filter)
-      );
-    },*/
+
     filteredData() {
       if (!this.filter || !this.rows) return this.rows;
       return this.rows.filter((d) => {
@@ -181,7 +163,6 @@ export default defineComponent({
 
     async getArtWorkRegistered() {
       try {
-        //
         const { data } = await api.get("paintings", {});
         console.log({ data });
         this.rows = data;
