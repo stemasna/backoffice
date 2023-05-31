@@ -112,6 +112,7 @@ export default defineComponent({
     },
     async createCodTag() {
       const id = this.id;
+      console.log(this.id);
       const { data } = await api.post(`securekits/${id}`, this.code);
       return data;
     },

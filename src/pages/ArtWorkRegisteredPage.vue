@@ -111,19 +111,41 @@ export default defineComponent({
           name: "date",
           label: this.$t("common.date"),
           align: "left",
-          field: (row) => row?.DataRegistrazione || " - ",
+          field: (row) => {
+            return (
+              new Date(row?.DataRegistrazione).toLocaleString("it-IT", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+              }) || " - "
+            );
+          },
         },
-        {
-          name: "hours",
-          label: this.$t("common.hours"),
-          align: "left",
-          field: (row) => row?.hours || " - ",
-        },
+        // {
+        //   name: "hours",
+        //   label: this.$t("common.hours"),
+        //   align: "left",
+        //   field: (row) => {
+        //     return (
+        //       new Date(row?.DataRegistrazione).toLocaleString("it-IT", {
+        //         hour: "numeric",
+        //         minute: "numeric",
+        //         second: "numeric",
+        //       }) || " - "
+        //     );
+        //   },
+        // },
         {
           name: "user_registrator",
           label: this.$t("common.user_registrator"),
           align: "left",
-          field: (row) => row?.utente_registratore || " - ",
+          field: (row) => {
+            if (row?.paintings_secureKit_utentes.length === 0) {
+              return " - ";
+            } else {
+              return row?.paintings_secureKit_utentes[0].email;
+            }
+          },
         },
       ],
     };
@@ -164,7 +186,7 @@ export default defineComponent({
     async getArtWorkRegistered() {
       try {
         const { data } = await api.get("paintings", {});
-        console.log({ data });
+        console.log(data);
         this.rows = data;
       } catch (e) {
         console.error({ e });

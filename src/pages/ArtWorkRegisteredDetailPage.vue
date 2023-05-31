@@ -23,6 +23,23 @@
         </div>
 
         <div class="title">
+          <!--  inizia immagine
+
+          <div class="form-group text-h6">
+            <input
+              type="file"
+              accept="image/*"
+              @change="previewImage"
+              class="form-control-file"
+              id="my-file"
+            />
+            <template v-if="preview">
+              <img :src="preview" class="img-fluid" />
+            </template>
+          </div>
+
+          fine immagine -->
+
           <q-input
             class="col-12 col-md-4"
             ref="name_artworkRef"
@@ -39,23 +56,7 @@
             </template>
           </q-input>
         </div>
-        <!-- inizia immagine -->
-        <!--
-        non si aspetta l'immagine
-        <div class="form-group text-h6">
-          <input
-            type="file"
-            accept="image/*"
-            @change="previewImage"
-            class="form-control-file"
-            id="my-file"
-          />
-          <template v-if="preview">
-            <img :src="preview" class="img-fluid" />
-          </template>
-        </div>
-      -->
-        <!-- fine immagine -->
+
         <!--
         <div class="row q-col-gutter-md q-mt-md text-h6">
           <q-input
@@ -92,31 +93,6 @@
           filled
           type="date"
         />
-        <!-- inizio nuova data -->
-
-        <!-- fine nuova data -->
-        <!--
-          <q-input
-            class="col-12 col-md-4"
-            ref="date"
-            :rules="[notEmpty]"
-            v-model="ArtWorkRegistered.date"
-            :label="$t('common.date')"
-            outlined
-            dense
-          /> -->
-        <!--
-            dire a fabio che la chiamata si
-            aspetta anche questo, quindi inserirlo
-          <q-input
-            class="col-12 col-md-4"
-            ref="series"
-            :rules="[notEmpty]"
-            v-model="ArtWorkRegistered.series"
-            :label="$t('common.series')"
-            outlined
-            dense
-          />-->
 
         <q-btn
           v-if="!ArtWorkRegistered._id"
@@ -150,6 +126,7 @@ import { useRouter, useRoute } from "vue-router";
 import AssociateTagModal from "components/modals/AssociateTagModal.vue";
 import { t } from "boot/i18n";
 import { useQuasar } from "quasar";
+//import ImageCard from "src/components/modals/ImageCard.vue";
 
 export default defineComponent({
   name: "ArtWorkRegisteredDetailPage",
@@ -168,32 +145,28 @@ export default defineComponent({
         NomeArtista: undefined,
         NazionalitaArtista: undefined,
         DataRegistrazione: undefined,
+        imageUrl: "",
       },
-
       name_artworkRef: undefined,
       name_artistRef: undefined,
-
       nationality_artistRef: undefined,
       dateRef: undefined,
+      preview: false,
     };
   },
   methods: {
     async notEmpty(val) {
       return !!val || (await t("common.requiredField"));
     },
-
     isValid() {
       const fieldsIsValid = [];
       fieldsIsValid.push(this.name_artworkRef.value.validate());
       fieldsIsValid.push(this.name_artistRef.value.validate());
       fieldsIsValid.push(this.nationality_artistRef.value.validate());
       fieldsIsValid.push(this.dateRef.value.validate());
-
       this.isAdd.value;
-
       return fieldsIsValid.every((f) => f === true);
     },
-
     async createArtWorkRegistered() {
       const { data } = await api.post("paintings/", this.ArtWorkRegistered);
       return data;
@@ -215,7 +188,6 @@ export default defineComponent({
         }
       } else {
         const userId = this.$route.params.id;
-
         const { data } = await api.put(
           `paintings/${userId}`,
           this.ArtWorkRegistered
@@ -232,9 +204,10 @@ export default defineComponent({
       }
     },
     async onClickAssociatedTag() {
+      console.log(this);
       return this.$q.dialog({
         component: AssociateTagModal,
-        componentProps: { id: this.ArtWorkRegistered.id },
+        componentProps: { id: this.ArtWorkRegistered._id },
       });
     },
   },
@@ -243,7 +216,6 @@ export default defineComponent({
       return this.$route.params.id === "new";
     },
   },
-
   async mounted() {
     //console.log(this.$route.params.id);
     if (this.$route.params.id === "new") {
@@ -257,5 +229,6 @@ export default defineComponent({
       //console.log(this.UserManaged);
     }
   },
+  // components: { ImageCard },
 });
 </script>
